@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, useWindowDimensions} from 'react-native';
+import {StyleSheet, Text, View, useWindowDimensions, Alert} from 'react-native';
 import React, {useState} from 'react';
 import IconedInput from '../../Components/IconInput';
 import Animated, {
@@ -6,6 +6,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withSpring,
 } from 'react-native-reanimated';
 import {Heading, SmallText, Button} from '../../Components';
@@ -20,11 +21,11 @@ const Onboarding = () => {
   const offset = useSharedValue(500);
 
   const handleContinue = () => {
-    HomeScreenHeight.value = withSpring(width);
+    HomeScreenHeight.value = withSpring(180, {duration: 500});
   };
 
   const handleGetStarted = () => {
-    HomeScreenHeight.value = withSpring(width);
+    Alert.alert('Button Clicked');
   };
 
   const pan = Gesture.Pan()
@@ -112,15 +113,15 @@ const Onboarding = () => {
       offset.value = HomeScreenHeight.value;
       console.log('onBeginDrag: ', contentOffset);
     },
-    // onScroll({contentOffset}) {
-    //   offset.value = contentOffset.x * 0.5 + HomeScreenHeight.value;
-    //   console.log(HomeScreenHeight.value, Height.value);
-    //   Height.value = withSpring(height + offset.value, {
-    //     velocity: 100,
-    //     duration: 1000,
-    //   });
-    //   console.log(contentOffset);
-    // },
+    onScroll({contentOffset}) {
+      offset.value = contentOffset.x * 0.5 + HomeScreenHeight.value;
+      console.log(HomeScreenHeight.value, Height.value);
+      Height.value = withSpring(height + offset.value, {
+        velocity: 100,
+        duration: 1000,
+      });
+      console.log(contentOffset);
+    },
     onEndDrag({contentOffset}) {
       offset.value = contentOffset.x * 0.5 + HomeScreenHeight.value;
       console.log('onEndDrag: ', contentOffset);

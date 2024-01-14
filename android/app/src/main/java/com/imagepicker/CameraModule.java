@@ -16,6 +16,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule;
 import android.util.Base64;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.WritableMap;
+
 import java.io.ByteArrayOutputStream;
 
 public class CameraModule extends ReactContextBaseJavaModule {
@@ -57,9 +58,23 @@ public class CameraModule extends ReactContextBaseJavaModule {
         }
     }
 
-    // Override onRequestPermissionsResult to handle the result of the permission request
 //    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        // Forward the result to your custom module
+//        handleRequestPermissionsResult(requestCode, grantResults);
+//    }
+//
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        // Forward the result to your custom module
+//        handleActivityResult(requestCode, resultCode, data);
+//    }
+
+    private void handleRequestPermissionsResult(int requestCode, int[] grantResults) {
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Camera permission granted, proceed with image capture
@@ -67,29 +82,27 @@ public class CameraModule extends ReactContextBaseJavaModule {
                 if (currentActivity != null) {
                     startImageCaptureIntent(currentActivity);
                 }
-            } else {
-                // Camera permission denied, handle accordingly (e.g., show a message to the user)
             }
         }
     }
 
-    // This method will be called when the camera activity returns result
-//    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    private void handleActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            System.out.println("CameraModule" + "onActivityResult: Image capture successful");
+
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
 
-
             // Convert the Bitmap to a Base64-encoded string
             String encodedImage = encodeToBase64(imageBitmap, Bitmap.CompressFormat.JPEG, 100);
-
-            // Send the image data to React Native
             sendImageToReactNative(encodedImage);
+        } else {
+            System.out.println("CameraModule" + "onActivityResult: Image capture failed");
         }
     }
 
     private String encodeToBase64(Bitmap imageBitmap, Bitmap.CompressFormat compressFormat, int quality) {
+        System.out.println("CameraModule" + "encodeToBase64 function called");
         ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
         imageBitmap.compress(compressFormat, quality, byteArrayOS);
         byte[] byteArray = byteArrayOS.toByteArray();
@@ -97,14 +110,29 @@ public class CameraModule extends ReactContextBaseJavaModule {
     }
 
     private void sendImageToReactNative(String encodedImage) {
-        // ReactContext reactContext = getReactApplicationContext();
-        // if (reactContext != null) {
-        //     WritableMap params = Arguments.createMap();
-        //     params.putString("imageData", encodedImage);
+        System.out.println("CameraModule" + "Please wait while we are sending");
+        ReactApplicationContext reactContext = getReactApplicationContext();
+        if (reactContext != null) {
+            WritableMap params = Arguments.createMap();
+            params.putString("imageData", encodedImage);
 
-        //     // Emit an event to React Native with the image data
-        //     reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-        //             .emit("onImageCaptured", params);
-        // }
+            System.out.println("CameraModule" + encodedImage);
+
+            // Emit an event to React Native with the image data
+            reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit("onImageCaptured", params);
+        } else {
+            System.out.println("CameraModule" + "ReactContext Null");
+        }
+    }
+
+    @ReactMethod
+    public void addListener(String eventName) {
+        // Implement your logic for adding a listener
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+        // Implement your logic for removing listeners
     }
 }
