@@ -1,13 +1,7 @@
 import {StyleSheet, View, useWindowDimensions, TextInput} from 'react-native';
-import React, {Dispatch, SetStateAction} from 'react';
+import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-type InputProp = {
-  value: string;
-  placeholder: string;
-  setValue: Dispatch<SetStateAction<any>>;
-  name: string;
-};
+import {InputProp} from '../../Constants/Types';
 
 const IconedInput = (props: InputProp) => {
   const {width} = useWindowDimensions();
@@ -33,15 +27,6 @@ const IconedInput = (props: InputProp) => {
     </View>
   );
 };
-
-// const simpleButton = () => (
-//   <TouchableOpacity
-//     onPress={handlePress} //() => NativeModules.CameraModule.captureImage()
-//     style={styles.button}>
-//     <Text style={styles.buttonText}>Show</Text>
-//     {/* {imageData.length > 0 && <Image source={{uri: ''}} />} */}
-//   </TouchableOpacity>
-// );
 
 export default IconedInput;
 

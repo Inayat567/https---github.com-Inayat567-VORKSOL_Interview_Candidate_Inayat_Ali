@@ -1,11 +1,8 @@
 import {StyleSheet, Text} from 'react-native';
 import React from 'react';
+import {TextProp} from '../../Constants/Types';
 
-type HeadingProp = {
-  title: string;
-};
-
-const Heading = (props: HeadingProp) => (
+const Heading = (props: TextProp) => (
   <Text style={styles.text}>{props.title}</Text>
 );
 

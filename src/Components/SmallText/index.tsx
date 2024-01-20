@@ -1,11 +1,8 @@
 import {StyleSheet, Text} from 'react-native';
 import React from 'react';
+import {TextProp} from '../../Constants/Types';
 
-type SmallTextProp = {
-  title: string;
-};
-
-const SmallText = (props: SmallTextProp) => (
+const SmallText = (props: TextProp) => (
   <Text style={styles.text}>{props.title}</Text>
 );
 

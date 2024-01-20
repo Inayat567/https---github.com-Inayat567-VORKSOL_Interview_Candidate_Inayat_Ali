@@ -2,13 +2,7 @@ import {StyleSheet, Text, TouchableOpacity} from 'react-native';
 import React from 'react';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-type ButtonProp = {
-  handlePress: any;
-  title: string;
-  iconed?: boolean;
-  iconName?: string;
-};
+import {ButtonProp} from '../../Constants/Types';
 
 const Button = (props: ButtonProp) => {
   return (

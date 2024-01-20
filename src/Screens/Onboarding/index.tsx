@@ -6,11 +6,10 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
   withSpring,
 } from 'react-native-reanimated';
 import {Heading, SmallText, Button} from '../../Components';
-import {Gesture, FlatList} from 'react-native-gesture-handler';
+import {Gesture} from 'react-native-gesture-handler';
 
 const Onboarding = () => {
   const {width, height} = useWindowDimensions();
@@ -18,7 +17,8 @@ const Onboarding = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const HomeScreenHeight = useSharedValue(0);
-  const offset = useSharedValue(500);
+  const heightOffset = useSharedValue(500);
+  const offset = useSharedValue(0);
 
   const handleContinue = () => {
     HomeScreenHeight.value = withSpring(180, {duration: 500});
@@ -30,19 +30,19 @@ const Onboarding = () => {
 
   const pan = Gesture.Pan()
     .onBegin(() => {
-      // offset.value = HomeScreenHeight.value;
-      // console.log(offset.value);
+      // heightOffset.value = HomeScreenHeight.value;
+      // console.log(heightOffset.value);
     })
     .onChange(event => {
-      // offset.value = event.translationX < -200 ? -200 : event.translationX;
-      // offset.value = offset.value + HomeScreenHeight.value;
+      // heightOffset.value = event.translationX < -200 ? -200 : event.translationX;
+      // heightOffset.value = heightOffset.value + HomeScreenHeight.value;
       // console.log(HomeScreenHeight.value, Height.value);
-      // Height.value = height - offset.value;
+      // Height.value = height - heightOffset.value;
     })
     .onFinalize(() => {
-      // Height.value = height - offset.value;
+      // Height.value = height - heightOffset.value;
       // console.log('Final: ', Height.value);
-      // HomeScreenHeight.value = offset.value;
+      // HomeScreenHeight.value = heightOffset.value;
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -110,22 +110,23 @@ const Onboarding = () => {
 
   const onScroll = useAnimatedScrollHandler({
     onBeginDrag({contentOffset}) {
-      offset.value = HomeScreenHeight.value;
+      heightOffset.value = HomeScreenHeight.value;
       console.log('onBeginDrag: ', contentOffset);
     },
     onScroll({contentOffset}) {
-      offset.value = contentOffset.x * 0.5 + HomeScreenHeight.value;
+      heightOffset.value = contentOffset.x * 0.5 + HomeScreenHeight.value;
       console.log(HomeScreenHeight.value, Height.value);
-      Height.value = withSpring(height + offset.value, {
+      Height.value = withSpring(height + heightOffset.value, {
         velocity: 100,
         duration: 1000,
       });
       console.log(contentOffset);
     },
     onEndDrag({contentOffset}) {
-      offset.value = contentOffset.x * 0.5 + HomeScreenHeight.value;
+      heightOffset.value = contentOffset.x * 0.5 + HomeScreenHeight.value;
+      offset.value = withSpring((contentOffset.x / width) * 2);
       console.log('onEndDrag: ', contentOffset);
-      Height.value = withSpring(height + offset.value, {
+      Height.value = withSpring(height + heightOffset.value, {
         velocity: 100,
         duration: 1000,
       });
@@ -142,14 +143,17 @@ const Onboarding = () => {
           disableIntervalMomentum
           snapToAlignment="start"
           decelerationRate="fast"
-          snapToInterval={width / 2} // Adjust this value
+          // snapToInterval={width / 2} // Adjust this value
           scrollEventThrottle={10}
+          onMomentumScrollEnd={event =>
+            (event.nativeEvent.contentOffset.x / width) * 6
+          }
           onScroll={onScroll}
-          getItemLayout={(data, index) => ({
-            length: 50,
-            offset: 50 * index,
-            index,
-          })}
+          // getItemLayout={(data, index) => ({
+          //   length: 50,
+          //   heightOffset: 50 * index,
+          //   index,
+          // })}
           data={data}
           keyExtractor={item => item.id.toString()}
           pagingEnabled
@@ -183,10 +187,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: 'flex-end',
-    position: 'absolute',
-    width: '100%',
-    right: '10%',
-    bottom: 20,
+    marginRight: '15%',
   },
   loginButtonContainer: {
     alignItems: 'flex-end',
